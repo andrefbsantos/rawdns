@@ -1,4 +1,4 @@
-package main // import "github.com/tianon/rawdns"
+package main // import "github.com/jacoelho/rawdns"
 
 import (
 	"encoding/json"
@@ -169,6 +169,13 @@ func handleDockerRequest(domain string, w dns.ResponseWriter, r *dns.Msg) {
 			}
 			container, err = dockerInspectContainer(config[domain].Socket, linkedContainerName)
 		}
+
+		// check for name_1 instead of name-1
+		if err != nil {
+			newName := strings.Replace(containerName, "-", "_", -1)
+			container, err = dockerInspectContainer(config[domain].Socket, newName)
+		}
+
 		if err != nil {
 			log.Printf("error: failed to lookup container %q: %v\n", containerName, err)
 			return
